@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PotholeAI by Nithin</title>
+  <style>
+    body { margin: 0; font-family: Arial; }
+    #header {
+      background: #1E3A5F;
+      color: white;
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    #map { height: calc(100vh - 50px); }
+  </style>
+</head>
+<body>
+
+<div id="header">PotholeAI by Nithin — Live Pothole Map</div>
+<div id="map"></div>
+
+<script>
+  // Replace with your Firebase database URL
+  const FIREBASE_URL = "https://your-project-default-rtdb.firebaseio.com";
+
+  function initMap() {
+    const map = new google.maps.Map(document.getElementById("map"), {
+      zoom: 15,
+      // Change these to your village GPS coordinates
+      center: { lat: 17.3850, lng: 78.4867 }
+    });
+
+    // Load potholes from Firebase
+    fetch(FIREBASE_URL + "/potholes.json")
+      .then(response => response.json())
+      .then(data => {
+        if (!data) {
+          console.log("No potholes yet. Drive around!");
+          return;
+        }
+
+        const colourMap = {
+          small:     "#FACC15",  // yellow
+          medium:    "#F97316",  // orange
+          dangerous: "#EF4444"   // red
+        };
+
+        Object.values(data).forEach(function(pothole) {
+          const colour = colourMap[pothole.label] || "#F97316";
+          const size   = 8 + (pothole.score || 5);
+
+          new google.maps.Marker({
+            position: { lat: pothole.lat, lng: pothole.lng },
+            map: map,
+            title: "Severity: " + pothole.score + "/10",
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              fillColor: colour,
+              fillOpacity: 0.9,
+              strokeColor: "#ffffff",
+              strokeWeight: 1.5,
+              scale: size
+            }
+          });
+        });
+      });
+  }
+</script>
+
+<!-- Replace YOUR_MAPS_API_KEY with key from console.cloud.google.com -->
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_MAPS_API_KEY&callback=initMap">
+</script>
+
+</body>
+</html>

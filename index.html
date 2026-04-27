@@ -1,30 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>PotholeAI Live Map</title>
+<title>Live Location Map</title>
 
-<link rel="stylesheet"
-href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
 <style>
-body { margin:0; font-family:Arial; }
-#header{
-background:#1E3A5F;
-color:white;
-padding:12px;
-font-weight:bold;
-}
-#map{
-height:calc(100vh - 50px);
-}
+body { margin:0; }
+#map { height:100vh; }
 </style>
 </head>
 
 <body>
-
-<div id="header">
-PotholeAI by Nithin — Live Pothole Map
-</div>
 
 <div id="map"></div>
 
@@ -32,18 +19,28 @@ PotholeAI by Nithin — Live Pothole Map
 
 <script>
 
-// Replace with your village coordinates
-var map = L.map('map').setView([17.3850,78.4867],15);
+// default map position
+var map = L.map('map').setView([0,0],15);
 
 L.tileLayer(
 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 { maxZoom:19 }
 ).addTo(map);
 
-// Test pothole marker
-L.marker([17.3850,78.4867])
+// get live location
+navigator.geolocation.getCurrentPosition(function(pos){
+
+var lat = pos.coords.latitude;
+var lng = pos.coords.longitude;
+
+map.setView([lat,lng],17);
+
+L.marker([lat,lng])
 .addTo(map)
-.bindPopup("Pothole Test Marker");
+.bindPopup("You are here")
+.openPopup();
+
+});
 
 </script>
 
